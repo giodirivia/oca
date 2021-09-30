@@ -3,6 +3,8 @@
 #include <string.h>
 using namespace std;
 
+#define SESSO 69
+
 struct Player{
   string nome;
   int somma_dadi;
@@ -13,7 +15,6 @@ using funcptr = int(*)(Player&);
 funcptr percorso[63];
 
 int partita_finita = 0;
-int trigger_check = 0;
 ///////////////////////////////////////////////////////////////////////////////////////// LANCIO DADI
 int _dado(){
   return rand() % 6 + 1;
@@ -22,10 +23,7 @@ int _dado(){
 int tira_dadi(Player& p){
   int dado_uno = _dado();
   int dado_due = _dado();
-  p.somma_dadi = dado_uno+dado_due;
   cout << p.nome << " ha tirato i dadi, ed e' uscito " << dado_uno << " e " << dado_due << "!" << endl;
-  cout <<   dado_due + dado_uno << endl;
-  percorso[p.casella](p);
   return dado_uno + dado_due;
 }
 /////////////////////////////////////////////////////////////////////////////////////////   CASELLE
@@ -41,18 +39,23 @@ int _ponte(Player& p){
   return 0;
 }
 int _locanda(Player& p){
-  cout << p.nome << " e' andato alla locanda!" << endl << "Si ferma a bere per 3 turni" << endl;
-  p.carcerato = 3;
+  if(p.carcerato == 0) {
+    p.carcerato = 3;
+    cout << p.nome << " e' andato alla locanda!" << endl << "Si ferma a bere per 3 turni" << endl;
+  } else {
+    p.carcerato--;
+    cout << p.nome << " e' ancora alla locanda!" << endl << "Gli mancano ancora " << p.carcerato << " turni" << endl;
+  }
   return 0;
 }
 int _pozzoPrigione(Player& p){
   cout << p.nome << " e' finito nel pozzo o nella prigione!"<< endl << "Stara' li' per un po'..." << endl;
-  trigger_check = 1;
+  p.carcerato = -1;
   return 0;
 }
 int _labirinto(Player& p){
   cout << p.nome << " e' finito nel labirinto!" << endl << "Si perde e si ritrova nella casella 39!" << endl;
-  p.casella == 39;
+  p.casella = 39;
   return 0;
 }
 int _scheletro(Player& p){
@@ -61,9 +64,9 @@ int _scheletro(Player& p){
   return 0;
 }
 int _finale(Player& p){
-  partita_finita == 1;
+  partita_finita = 1;
   cout << "La partita e' finita! Vince " << p.nome << "!" << endl;
-  return 0;
+  return 69;
 }
 int _generica(Player& p){
   cout << p.nome << " non fa niente di speciale..." << endl;
@@ -72,13 +75,13 @@ int _generica(Player& p){
 /////////////////////////////////////////////////////////////////////////////////////////   rules
 int checkPrigione(Player p[], int n, int player_scambio){
   for(int x = 0; x < n; x++){
-    if(p[x].carcerato == 1 && x != player_scambio){
-
+    if(x != player_scambio && p[x].carcerato < 0 && p[player_scambio].carcerato < 0){
+      p[x].carcerato = 0;
     }
   }
-  trigger_check == 0;
   return 0;
 }
+
 void makePercorso(funcptr percorso[]){
   for(int x = 0; x < 63; x++){
     int oca_tmp[7] = {5,9,18,27,36,45,54};
@@ -133,19 +136,19 @@ int main(){
   while(partita_finita == 0){
     for(int turno = 0; turno < n_players; turno++){
       cout << "e' il turno di " << players[turno].nome << "!" << endl;
+      // se il player non Ã¨ in prigione, allora si controlla tutto
       if(players[turno].carcerato == 0){
         players[turno].somma_dadi = tira_dadi(players[turno]);
+        players[turno].casella += players[turno].somma_dadi;
       }
       //se il player arriva a una casella >62, torna indietro di tante caselle quante sono quelle dopo il 63
       if(players[turno].casella > 62){
-        players[turno].casella == 62 - (players[turno].casella - 62);
+        players[turno].casella = 62 - (players[turno].casella - 62);
       }
+      if(percorso[players[turno].casella](players[turno]) == SESSO) break;
       cout << players[turno].nome << " e' nella casella " << players[turno].casella << endl;
-      percorso[players[turno].casella](players[turno]);
       //check per scambio nella prigione (se un player arriva nella casella prigione, aspetta li' finche' non lo salvano)
-      if(trigger_check == 1){
-        checkPrigione(players, n_players, turno);
-      }
+      checkPrigione(players, n_players, turno);
     }
   }
 
