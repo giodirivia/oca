@@ -1,9 +1,10 @@
 #include <iostream>
 #include <random>
 #include <string.h>
+#include <unistd.h>
 using namespace std;
 
-#define SESSO 69
+#define VITTORIA 42069
 
 struct Player{
   string nome;
@@ -15,6 +16,7 @@ using funcptr = int(*)(Player&);
 funcptr percorso[63];
 
 int partita_finita = 0;
+int usec;
 ///////////////////////////////////////////////////////////////////////////////////////// LANCIO DADI
 int _dado(){
   return rand() % 6 + 1;
@@ -66,7 +68,7 @@ int _scheletro(Player& p){
 int _finale(Player& p){
   partita_finita = 1;
   cout << "La partita e' finita! Vince " << p.nome << "!" << endl;
-  return 69;
+  return 42069;
 }
 int _generica(Player& p){
   cout << p.nome << " non fa niente di speciale..." << endl;
@@ -115,6 +117,10 @@ void makePercorso(funcptr percorso[]){
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 int main(){
+  //customization
+  cout << "A che velocita' vuoi vedere il gioco? [ms]" << endl;
+  cin >> usec;
+  usec = usec *1000;
   srand(time(NULL));
   /////////////// INIT PERCORSO
   makePercorso(percorso);
@@ -136,19 +142,26 @@ int main(){
   while(partita_finita == 0){
     for(int turno = 0; turno < n_players; turno++){
       cout << "e' il turno di " << players[turno].nome << "!" << endl;
+      usleep(usec);
       // se il player non Ã¨ in prigione, allora si controlla tutto
       if(players[turno].carcerato == 0){
+        usleep(usec);
         players[turno].somma_dadi = tira_dadi(players[turno]);
         players[turno].casella += players[turno].somma_dadi;
       }
       //se il player arriva a una casella >62, torna indietro di tante caselle quante sono quelle dopo il 63
       if(players[turno].casella > 62){
+        usleep(usec);
         players[turno].casella = 62 - (players[turno].casella - 62);
       }
-      if(percorso[players[turno].casella](players[turno]) == SESSO) break;
+      //condizione di vittoria
+      if(percorso[players[turno].casella](players[turno]) == VITTORIA) break;
+
       cout << players[turno].nome << " e' nella casella " << players[turno].casella << endl;
       //check per scambio nella prigione (se un player arriva nella casella prigione, aspetta li' finche' non lo salvano)
       checkPrigione(players, n_players, turno);
+      usleep(usec);
+      cout << endl;
     }
   }
 
