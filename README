@@ -1,0 +1,21 @@
+# oca
+---REGOLE---
+Al Gioco dell'oca possono partecipare da 2 a 6 giocatori
+che dovranno spostare le loro pedine lungo un percorso di 
+63 caselle; a turno ogni giocatore lancerà i dadi e muoverà
+la propria pedina di un numero di caselle pari alla somma 
+uscita dai dadi; vincerà chi arriverà nella casella n. 90. 
+Dopo averla spostata la pedina potrà capitare in una casella 
+speciale: se si cade in una casella “oca” (caselle n. 5, 9, 18, 27, 36, 45, 54) 
+si deve proseguire di tante caselle quanto era il valore dei dadi precedentemente lanciati; 
+nella casella “ponte” (n. 6) si devono lanciare di nuovo i dadi; 
+se si capita nella casella “locanda” (n. 19) bisogna fermarsi per 3 turni; 
+se si arriva nella casella “pozzo” (n. 31) o “prigione” (n. 52) 
+si rimane bloccati finché non arriva un altro giocatore a prendere il proprio posto; 
+se ci si ferma nella casella “labirinto” (n. 42) si deve tornare alla casella 39;
+se si arriva nella casella “scheletro” (n. 58) si dovrà ripartire dalla casella n. 1.
+La casella di arrivo va raggiunta con un lancio di dadi esatto, altrimenti si 
+dovrà retrocedere dei punti in eccesso. Scrivi un programma che simuli il gioco dell’oca; 
+non verrà visualizzato il tabellone del gioco ma dovranno essere emessi dei messaggi 
+che descrivono la mossa fatta, le eventuali caselle speciali incrociate, e la casella di arrivo. 
+Si può anche implementare una versione giocatore vs PC

@@ -13,10 +13,9 @@ using funcptr = int(*)(Player&);
 funcptr percorso[63];
 
 int partita_finita = 0;
-
+int trigger_check = 0;
 ///////////////////////////////////////////////////////////////////////////////////////// LANCIO DADI
 int _dado(){
-  srand(time(NULL));
   return rand() % 6 + 1;
 }
 
@@ -25,6 +24,8 @@ int tira_dadi(Player& p){
   int dado_due = _dado();
   p.somma_dadi = dado_uno+dado_due;
   cout << p.nome << " ha tirato i dadi, ed e' uscito " << dado_uno << " e " << dado_due << "!" << endl;
+  cout <<   dado_due + dado_uno << endl;
+  percorso[p.casella](p);
   return dado_uno + dado_due;
 }
 /////////////////////////////////////////////////////////////////////////////////////////   CASELLE
@@ -46,7 +47,7 @@ int _locanda(Player& p){
 }
 int _pozzoPrigione(Player& p){
   cout << p.nome << " e' finito nel pozzo o nella prigione!"<< endl << "Stara' li' per un po'..." << endl;
-  p.carcerato = -1;
+  trigger_check = 1;
   return 0;
 }
 int _labirinto(Player& p){
@@ -66,6 +67,16 @@ int _finale(Player& p){
 }
 int _generica(Player& p){
   cout << p.nome << " non fa niente di speciale..." << endl;
+  return 0;
+}
+/////////////////////////////////////////////////////////////////////////////////////////   rules
+int checkPrigione(Player p[], int n, int player_scambio){
+  for(int x = 0; x < n; x++){
+    if(p[x].carcerato == 1 && x != player_scambio){
+
+    }
+  }
+  trigger_check == 0;
   return 0;
 }
 void makePercorso(funcptr percorso[]){
@@ -101,6 +112,7 @@ void makePercorso(funcptr percorso[]){
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 int main(){
+  srand(time(NULL));
   /////////////// INIT PERCORSO
   makePercorso(percorso);
   /////////////// INPUT NUMERO GIOCATORI
@@ -121,8 +133,19 @@ int main(){
   while(partita_finita == 0){
     for(int turno = 0; turno < n_players; turno++){
       cout << "e' il turno di " << players[turno].nome << "!" << endl;
-      tira_dadi(players[turno]);
+      if(players[turno].carcerato == 0){
+        players[turno].somma_dadi = tira_dadi(players[turno]);
+      }
+      //se il player arriva a una casella >62, torna indietro di tante caselle quante sono quelle dopo il 63
+      if(players[turno].casella > 62){
+        players[turno].casella == 62 - (players[turno].casella - 62);
+      }
+      cout << players[turno].nome << " e' nella casella " << players[turno].casella << endl;
       percorso[players[turno].casella](players[turno]);
+      //check per scambio nella prigione (se un player arriva nella casella prigione, aspetta li' finche' non lo salvano)
+      if(trigger_check == 1){
+        checkPrigione(players, n_players, turno);
+      }
     }
   }
 
